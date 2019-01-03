@@ -1,0 +1,27 @@
+*UnixDomainSockets
+initialize: socketType withDomain: socketDomain
+	"Initialize a new socket handle. If socket creation fails, socketHandle will be set to nil."
+
+	| semaIndex readSemaIndex writeSemaIndex |
+	semaphore := Semaphore new.
+	readSemaphore := Semaphore new.
+	writeSemaphore := Semaphore new.
+	semaIndex := Smalltalk registerExternalObject: semaphore.
+	readSemaIndex := Smalltalk registerExternalObject: readSemaphore.
+	writeSemaIndex := Smalltalk registerExternalObject: writeSemaphore.
+	socketHandle := self
+		primSocketCreateNetwork: socketDomain
+		type: socketType
+		receiveBufferSize: 8000
+		sendBufSize: 8000
+		semaIndex: semaIndex
+		readSemaIndex: readSemaIndex
+		writeSemaIndex: writeSemaIndex.
+	socketHandle isNil
+		ifTrue: [ 
+			"socket creation failed"
+			Smalltalk unregisterExternalObject: semaphore.
+			Smalltalk unregisterExternalObject: readSemaphore.
+			Smalltalk unregisterExternalObject: writeSemaphore.
+			readSemaphore := writeSemaphore := semaphore := nil ]
+		ifFalse: [ self register ]
