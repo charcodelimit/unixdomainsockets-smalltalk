@@ -1,7 +1,7 @@
-# Unix Domain Sockets for Pharo Smalltalk
+# Unix Domain Sockets for Smalltalk
 
-Adds support for Unix domain sockets to [Pharo](http://pharo.org) Smalltalk.
-Should work with [Squeak](http://www.squeak.org) as well.
+Adds support for Unix domain sockets to [Pharo](http://pharo.org) 
+and [Squeak](http://www.squeak.org) Smalltalk.
 
 ## Requires
 
@@ -27,9 +27,10 @@ Pierce Ng:
 * [Unix Domain Sockets on Pharo](https://www.samadhiweb.com/blog/2013.07.27.unixdomainsockets.html)
 * [GOODS OODB on Unix Domain Sockets](https://www.samadhiweb.com/blog/2013.07.28.goods.oodb.html)
 
-Here is the example described there.
+The following example closely follows the one described in the blog, and is available
+in the implemenation as integration test as well.
 
-First run the following server code written in Python:
+First run the following echo server [script](tests/uds-echo.py) written in Python:
 
 ```Python
 import socket,os
@@ -53,12 +54,13 @@ conn.close()
 Then connect to it from within Smalltalk:
 
 ```Smalltalk
-| socket stream |
+| socket stream message |
 socket := Socket newIPC connectTo: (NetNameResolver addressForSocketPath: '/tmp/echo-test').
 (Delay forMilliseconds: 10) wait.
 stream := SocketStream on: socket.
-stream nextPutAll: 'Hello, from Smalltalk!'.
-Transcript show: stream receiveData; cr.
+message := 'Hello, from Smalltalk!'.
+stream nextPutAll: message; flush.
+Transcript show: (stream next: message size); cr.
 stream close.
 ```
 

@@ -2,14 +2,14 @@
 addressForSocketPath: aSocketPathString
 	| size socketAddress |
 	self initializeNetwork.
-	self class
+	self
 		primGetAddressInfoHost: ''
 		service: aSocketPathString
 		flags: 0
 		family: 1
 		type: 0
 		protocol: 0.
-	size := self class primGetAddressInfoSize.
+	size := self primGetAddressInfoSize.
 	socketAddress := SocketAddress new: size withAll: 0.
-	self class primGetAddressInfoResult: socketAddress.
+	self primGetAddressInfoResult: socketAddress.
 	^ socketAddress
